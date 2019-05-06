@@ -7,6 +7,8 @@ class Number(BaseBox):
     self.value = value
   def eval(self):
     return self.value
+
+#Binary Operators
 class BinaryOp(BaseBox):
   def __init__(self, lhs, rhs):
     self.lhs = lhs
@@ -20,104 +22,87 @@ class Sub(BinaryOp):
 class Mul(BinaryOp):
   def eval(self):
     return self.lhs.eval() * self.rhs.eval()
-class Div(BinaryOp):
+
+#Unary Operators  
+class UnaryOp(BaseBox):
+  def __init__(self, lhs, rhs):
+    self.lhs = lhs
+    self.rhs = rhs
+class Positive(UnaryOp):
   def eval(self):
-    return self.lhs.eval() / self.rhs.eval()
-class Eq(BinaryOp):
+    return +(self.lhs.eval())
+class Negate(UnaryOp):
   def eval(self):
-    return self.lhs.eval() = self.rhs.eval()
+    return -(self.lhs.eval())
+
+#class Equal(BinaryOp):
+ #   return self.rhs.eval()
 
 pg = ParserGenerator(
-["PLUS", "MINUS", "MULTIPLY", "DIVIDE", "LPAREN", "RPAREN", "NUMBER", "EQUAL", "IDENTIFIER"],
-    precedence = [("left", ['MULTIPLY', 'DIVIDE']), ("left", ['PLUS', 'MINUS'])], cache_id="aaron_parser")
+["POSITIVE", "NEGATE","PLUS", "MINUS", "MULTIPLY", "LPAREN", "RPAREN", "NUMBER", "EQUAL", "IDENTIFIER"],
+    precedence = [("left", ['POSITIVE', 'NEGATE']), ("left", ['MULTIPLY', 'DIVIDE']), ("left", ['PLUS', 'MINUS'])], cache_id="aaron_parser")
 
-def NUMBER(p):
-  p.value = int(p.value)
-  return p
-
-def p_newline(p):
-  r'\n'
-  p.lexer.lineno += (p.value)
-
-@pg.production('main : stmt')
-def main(p):
-	return p[0]
-
-@pg.production('stmt : expr')
-def stmt_expr(state,p):
-   return p[0]
-  
-@pg.production('expr : fact')
-def expr_fact(state,p):
-    return p[0]
-  
-@pg.production('fact : IDENTIFIER')
-def fact_ID(state,p):
-    return p[0]
-
-@pg.production('stmt : IDENTIFIER = expr')
-def stmt_assign(state, p):
-   return Assignment(Variable(p[1].getstr()),p[3])
-
-@pg.production("expr : expr PLUS expr")
-@pg.production("expr : expr MINUS expr")
-@pg.production("expr : expr MULTIPLY expr")
-@pg.production("expr : expr DIVIDE expr")
-@pg.production("expr : expr EQUAL expr")
-
-def expr_op(p):
-	lhs = p[0].getint()
-	rhs = p[2].getint()
-	if p[1].gettokentype() == "PLUS":
-		return BoxInt(lhs + rhs)
-	elif p[1].gettokentype() == "MINUS":
-		return BoxInt(lhs - rhs)
-	elif p[1].gettokentype() == "MULTIPLY":
-		return BoxInt(lhs * rhs)
-	elif p[1].gettokentype() == "DIVIDE":
-		return BoxInt(lhs / rhs)
-  #elif p[1].gettokentype () == "EQUAL":
-    #return BoxInt(lhs = rhs)
-	else:
-		raise AssertionError("Possible missing operator")
-
-#@pg.production("expr : IF expr COLON stmt END")
-#def expr_if(state, p):
-#    return If(condition=p[1], body=p[3])
-
-def p_error(p):
-  print("Illegal character found: '%s'" % p.value[0])
-  p.lexer.skip(1)
-
-class Variable(BaseBox):
-  def init(self,name):
-    self.name=str(name)
-    self.value=None 
-  def getname(self):
-    return str(self.name)
-  def eval(self,env):
-        #if env.variables.get(self.name, None) is not None:
-            #self.value = env.variables[self.name].eval(env)
-    return self.value
-        #raise LogicError("Not defined yet")
-  def to_string(self):
-    return str(self.name)
-      
-class Boolean(BaseBox):
-  def init(self, value):
-    self.value = bool(value)
-  def eval(self,env):
-    return self
-  def to_string(self):
-    return str(self.value).lower()
-    
-class BoxInt(BaseBox):
-	def __init__(self, value):
-		self.value = value
-	def getint(self):
-		return self.value
+@pg.production('expr : expr PLUS term')
+@pg.production('expr : expr MINUS term')
+def expr_binop(p):
+  left = p[0]
+  right = p[2]
+  if p[1].gettokentype()=='PLUS':
+    return Add(left,right)
+  elif p[1].getttokentype() == 'MINUS':
+    return Sub(left,right)
+  else:
+    raise AssertionError('Operation not defined %d', token.gettokentype())
 
 parser = pg.build()
+'''    
+@pg.production(' expr : term ')
+def expr_term(p):
+  return p[2]
+
+@pg.production('term MULTIPLY fact')
+def term_mul(p):
+  left = p[0]
+  right = p[2]
+  if p[1].gettokentype()=="MULTIPLY":
+    return Mul(left,right)
+  else:
+    raise AssertionError('Binary Operation not defined %d', token.gettokentype())
+  
+@pg.production('term : fact')
+def term_fact(p):
+  return p[2]
+
+@pg.production('fact : LPAREN expr RPAREN')
+def parenthesis(p):
+  return p[1]
+
+@pg.production('fact : NEGATE fact ')
+@pg.production('fact : POSITIVE fact')
+def fact_unaryop(p):
+  left = p[0]
+  right = p[1]
+  if p[0].gettokentype()=="POSITIVE":
+    return Positive(left,right)
+  elif p[0].gettokentype()=="NEGATE":
+    return Negate(left,right)
+  else:
+    raise AssertionError('Unary Operation not defined %d', token.gettokentype())
+    
+@pg.production('fact : Number')
+def fact_number(p):
+  return Number(int(p[0].getstr()))
+
+@pg.production('fact : IDENTIFIER')
+def fact_ID(p):
+  return 
+  
+class BoxInt(BaseBox):
+  def __init__(self, value):
+    self.value = value
+  def getint(self):
+    return self.value
+'''
 
 #parser.parse(lexer.lex("let a = 5"), Environment()).to_string()
 list(lexer.lex("005+4"))
