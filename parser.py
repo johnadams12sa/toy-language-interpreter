@@ -1,5 +1,6 @@
 from rply import ParserGenerator
 from rply.token import BaseBox
+import ast
 
 #PARSER
 class Number(BaseBox):
@@ -36,10 +37,6 @@ class Positive(UnaryOp):
 class Negate(UnaryOp):
   def eval(self):
     return -(self.lhs.eval())
-#Assignment Operator
-class Assignment():
-  def ():
-    return 
 
 #class Equal(BinaryOp):
  #   return self.rhs.eval()
@@ -110,7 +107,7 @@ def fact_ID(p):
   
 @pg.production('expr : IDENTIFIER EQUAL expr')
 def expr_assign(p):
-  return p[0]
+  return ast.Assign(ast.IdentifierReference(p[0].getstr()), p[2])
   #return Assignment(Variable(p[1].getstr()),p[3])
   
 class BoxInt(BaseBox):
