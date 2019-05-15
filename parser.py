@@ -1,6 +1,6 @@
 from rply import ParserGenerator
 from rply.token import BaseBox
-import ast
+import lex.py
 
 #PARSER
 class Number(BaseBox):
