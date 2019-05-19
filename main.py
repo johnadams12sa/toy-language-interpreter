@@ -5,7 +5,7 @@ from parser import parseText
 import io
 
 def main():
-	path = '/Users/aaronyam/CISC3160/toy-language-interpreter/test.py'
+	path = 'EDIT_PATH_TO_FILE_HERE'
 	path_file = open(path , "r")
 	for x in path_file:
 		try:
