@@ -15,5 +15,4 @@ please run: !pip install rply
 before proceeding to run the program
 
 Modify path to file if using your own test input in main.py
-
 By default, the path is not a valid directory/ path
