@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from rply.token import BaseBox
 from rply import ParserGenerator
 from lex import lexer
