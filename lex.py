@@ -1,4 +1,4 @@
-#!pip install rply
+#!/usr/bin/python3
 from rply import LexerGenerator
 
 #LEXICAL ANALYZER
