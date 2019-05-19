@@ -1,23 +1,6 @@
-!pip install rply
-from rply import LexerGenerator
 from rply.token import BaseBox
 from rply import ParserGenerator
-
-lg = LexerGenerator()
-
-lg.add('NUMBER', r'\d+')
-lg.add('PLUS', r'\+')
-lg.add('MINUS', r'-')
-lg.add('MUL', r'\*')
-lg.add('DIV', r'/')
-lg.add('EQUAL', r'=')
-lg.add('OPEN_PARENS', r'\(')
-lg.add('CLOSE_PARENS', r'\)')
-lg.add("IDENTIFIER", r"[a-zA-Z_][a-zA-Z0-9_]*")
-
-lg.ignore('\s+')
-
-lexer = lg.build()
+from lex import lexer
 
 class Number(BaseBox):
     def __init__(self, value):
@@ -51,7 +34,7 @@ class Equal(BinaryOp):
     def eval(self):
       temp_list_key = []
       temp_list_value = []
-      temp_list_key.append(str(self.left))
+      temp_list_key.append(str(self.left.value))
       temp_list_value.append(str(self.right.eval()))
       for i in temp_list_key:
         for k in temp_list_value:
@@ -106,10 +89,13 @@ def expression_binop(p):
     else:
         raise AssertionError('Oops, this should not be possible!')
 
+@pg.error
+def error_handler(token):
+    raise ValueError("Ran into a %s where it wasn't expected" % token.gettokentype())
+
 parser = pg.build()
 
-parser.parse(lexer.lex(' y = 75 + 50')).eval()
-parser.parse(lexer.lex('dq = 5')).eval()
-#symbol_table['xander'] = '3'
-for x in symbol_table:
-  print(x + ' = ' + symbol_table[x])
+def parseText(argFromFile):
+        parser.parse(lexer.lex(str(argFromFile))).eval()
+        for x in symbol_table:
+                print(x + ' = ' + symbol_table[x])
