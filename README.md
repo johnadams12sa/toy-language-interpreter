@@ -7,15 +7,12 @@ Fix is coming soon!
 
 Uses module RPLY
 If using Python 3
-please run: pip3 install rply
-
+please run: pip3 install rply 
 before proceeding to run the program
 
 If using Google Colabs
-please run: !pip install rply
-
+please run: !pip install rply 
 before proceeding to run the program
 
-Modify path to file if using your own test input in main.py
-
+Modify path to file if using your own test input in main.py 
 By default, the path is not a valid directory/ path
